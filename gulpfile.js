@@ -17,19 +17,87 @@
 // 		console.log(event.type","event.path);
 // });	
 
-//var
+/////////Dependencies
 
 var gulp = require('gulp');
-var files = ['./*.js', './**/*.js'];
-var jshint = require('gulp-jshint');
-var jscs = require('gulp-jscs');
+var args = require('yargs').argv;
+var $ = require('gulp-load-plugins')({lazy: true});
+var config = require('./gulp.config')();
+var del = require('del');
 
-//JSHint and JSCS
+//////////JSHint and JSCS
 
 gulp.task('vet', function () {
-	return gulp.src(files)
-	.pipe(jscs())
-	.pipe(jshint())
-	.pipe(jshint.reporter('jshint-stylish', {verbose: true}));
+	log('Analisando codigo com JSHint and JSCS');
+
+	return gulp.src(config.alljs)
+		.pipe($.if(args.verbose, $.print()))
+		.pipe($.jscs())
+		.pipe($.jshint())
+		.pipe($.jshint.reporter('jshint-stylish', {verbose: true}))
+		.pipe($.jshint.reporter('fail'));
 });
 
+//////////Less
+
+gulp.task('less', ['clean-css'], function () {
+	log('Copilando Less --> CSS');
+
+	return gulp
+		.src(config.less)
+		.pipe($.less)
+		.pipe($.autoprefixer({browsers: ['last 2 version', '> 5%']}))
+		.pipe(gulp.dest(config.tmp));
+});
+
+//////////Sass
+
+gulp.task('sass', ['clean-css'], function () {
+	log('Copilando Sass --> CSS');
+
+	return gulp
+		.src(config.sass)
+		.pipe($.sass)
+		.pipe($.autoprefixer({browsers: ['last 2 version', '> 5%']}))
+		.pipe(gulp.dest(config.tmp));
+});
+
+//////////Stylus
+
+gulp.task('stylus', ['clean-css'], function () {
+	log('Copilando Stylus --> CSS');
+
+	return gulp
+		.src(config.stylus)
+		.pipe($.stylus)
+		.pipe($.autoprefixer({browsers: ['last 2 version', '> 5%']}))
+		.pipe(gulp.dest(config.tmp));
+});
+
+///////////Clean CSS files
+
+gulp.task('clean-css', function (done) {
+	var files = config.tmp + '**/*.css';
+	clean(files, done)
+});
+
+///////////Clean
+
+function clean(path, done) {
+	log('Limpando: ' + $.util.colors.blues(path));
+	del(path, done);
+}
+
+///////////Log
+
+function log(msg) {
+	if (typeof(msn) === 'object') {
+		for (var item in msg) {
+			if (msn.hasOwnProperty(item)) {
+				$.util.log($.util.colors.blue(msg[item]));
+			}
+		}
+	} else {
+		$.util.log($.util.colors.blue(msg));
+	}
+}

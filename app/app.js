@@ -1,0 +1,3 @@
+fucntion test() {
+	return true;
+}
