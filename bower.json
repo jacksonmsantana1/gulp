@@ -1,0 +1,10 @@
+{
+  "name": "gulp-project",
+  "version": "0.0.0",
+  "homepage": "https://github.com/jacksonmsantana1/gulp",
+  "authors": [
+    "jacksonmsantana1 <jackson.m.santana1@gmail.com>"
+  ],
+  "description": "A starter project with gulp",
+  "license": "MIT"
+}

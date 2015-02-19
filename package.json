@@ -1,0 +1,20 @@
+{
+  "name": "gulp-project",
+  "version": "1.0.0",
+  "description": "Project with a complete gulpfile.",
+  "main": "gulpfile.js",
+  "repository": "https://github.com/jacksonmsantana1/gulp",
+  "scripts": {
+    "init": "npm install",
+    "install": "bower install",
+    "start": "node /server/app.js"
+  },
+  "author": "Jackson Martorano Sant'Ana",
+  "license": "MIT",
+  "devDependencies": {
+    "gulp": "^3.8.11",
+    "gulp-jscs": "^1.4.0",
+    "gulp-jshint": "^1.9.2",
+    "jshint-stylish": "^1.0.0"
+  }
+}
