@@ -25,6 +25,7 @@
 
 var gulp = require('gulp');
 var args = require('yargs').argv;
+var browserSync = require('browser-sync');
 var $ = require('gulp-load-plugins')({lazy: true}); //Falta ainda usar o npm.
 var config = require('./gulp.config')();
 var del = require('del');
@@ -85,19 +86,19 @@ gulp.task('stylus', ['clean-css'], function () {
 ///////////Less-watcher
 
 gulp.task('less-watcher', function () {
-	gulp.watch([config.less], ['less'])
+	gulp.watch([config.less], ['less']);
 });
 
 ///////////Sass-watcher
 
 gulp.task('sass-watcher', function () {
-	gulp.watch([config.sass], ['sass'])
+	gulp.watch([config.sass], ['sass']);
 });
 
 ///////////Stylus-watcher
 
 gulp.task('stylus-watcher', function () {
-	gulp.watch([config.stylus], ['stylus'])
+	gulp.watch([config.stylus], ['stylus']);
 });
 
 ///////////Wiredep
@@ -141,9 +142,14 @@ gulp.task('serve-dev' ['inject'], function () {
 		.on('restart', ['vet'], function (env) {
 			log('*** nodemon restarted');
 			log('files changed on restart:\n' + env);
+			setTimeout(function () {
+				browserSync.notify('reloading now ...');
+				browserSync.reload({stream: false});
+			}, 1000);
 		})
 		.on('start', function () {
 			log('*** nodemon started');
+			startBrowserSync();
 		})
 		.on('crash', function () {
 			log('*** nodemon crashed');
@@ -152,6 +158,54 @@ gulp.task('serve-dev' ['inject'], function () {
 			log('*** nodemon excited cleanly');
 		});
 });
+
+///////////BrowserSync
+
+function startBrowserSync() {
+	if (args.nosync || browserSync.active) {
+		return;
+	}
+
+	log('Começando browser-sync na porta ' + port);
+
+	//gulp.watch([config.less], ['less']);
+
+	//gulp.watch([config.sass], ['sass']);
+
+	gulp.watch([config.stylus], ['stylus'])
+		.on('change', function (event) { changeEvent(event); });
+
+	var options = {
+		proxy: 'localhost' + port,
+		port: 3000,
+		files: [
+			config.client + '**/*.*',
+			'!' + config.less,
+			config.tmp + '**/*.css'
+		],
+		ghostMode: {
+			clicks: true,
+			location: false,
+			forms: true,
+			scroll: true
+		},
+		injectChanges: true,
+		logFileChanges: true,
+		logLevel: 'debug',
+		logPrefix: 'gulp-patterns',
+		notify: true,
+		reloadDelay: 1000
+	};
+
+	browserSync(options);
+};
+
+///////////ChangeEvent
+
+function changeEvent(event) {
+	var srcPattern = new RegExp('/.*(?=/' + config.source + ')/');
+	log('Arquivo ' + event.path.replace(srcPattern, '') + ' ' + event.type);	
+}
 
 ///////////Clean CSS files
 

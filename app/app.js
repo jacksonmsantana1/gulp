@@ -1,3 +1,0 @@
-fucntion test() {
-	return true;
-}
