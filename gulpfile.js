@@ -17,13 +17,18 @@
 // 		console.log(event.type","event.path);
 // });	
 
+// Wiredep and gulp-inject
+// <!-- bower:type -->
+// <!-- inject:type -->
+
 /////////Dependencies
 
 var gulp = require('gulp');
 var args = require('yargs').argv;
-var $ = require('gulp-load-plugins')({lazy: true});
+var $ = require('gulp-load-plugins')({lazy: true}); //Falta ainda usar o npm.
 var config = require('./gulp.config')();
 var del = require('del');
+var port = process.env.PORT || config.defaultPort;
 
 //////////JSHint and JSCS
 
@@ -45,7 +50,8 @@ gulp.task('less', ['clean-css'], function () {
 
 	return gulp
 		.src(config.less)
-		.pipe($.less)
+		.pipe($.plumber())
+		.pipe($.less())
 		.pipe($.autoprefixer({browsers: ['last 2 version', '> 5%']}))
 		.pipe(gulp.dest(config.tmp));
 });
@@ -57,7 +63,8 @@ gulp.task('sass', ['clean-css'], function () {
 
 	return gulp
 		.src(config.sass)
-		.pipe($.sass)
+		.pipe($.plumber())
+		.pipe($.sass())
 		.pipe($.autoprefixer({browsers: ['last 2 version', '> 5%']}))
 		.pipe(gulp.dest(config.tmp));
 });
@@ -69,9 +76,81 @@ gulp.task('stylus', ['clean-css'], function () {
 
 	return gulp
 		.src(config.stylus)
-		.pipe($.stylus)
+		.pipe($.plumber())
+		.pipe($.stylus())
 		.pipe($.autoprefixer({browsers: ['last 2 version', '> 5%']}))
 		.pipe(gulp.dest(config.tmp));
+});
+
+///////////Less-watcher
+
+gulp.task('less-watcher', function () {
+	gulp.watch([config.less], ['less'])
+});
+
+///////////Sass-watcher
+
+gulp.task('sass-watcher', function () {
+	gulp.watch([config.sass], ['sass'])
+});
+
+///////////Stylus-watcher
+
+gulp.task('stylus-watcher', function () {
+	gulp.watch([config.stylus], ['stylus'])
+});
+
+///////////Wiredep
+
+gulp.task('wiredep', function () {
+	var options = config.getWiredepDefaultOptions();
+	var wiredep = require('wiredep').stream;
+
+	return gulp
+		.src(config.index)
+		.pipe(wiredep(options))
+		.pipe($.inject(gulp.src(config.js)))
+		.pipe(gulp.dest(config.client));
+});
+
+///////////Inject
+
+gulp.task('inject', ['wiredep', 'stylus'], function () {
+	return gulp
+		.src(config.index)
+		.pipe($.inject(gulp.src(config.css)))
+		.pipe(gulp.dest(config.client));
+});
+
+///////////Serve-dev
+
+gulp.task('serve-dev' ['inject'], function () {
+	var isDev = true;
+
+	var nodeOptions = {
+		script: config.nodeServer, //app.js
+		delayTime: 1,
+		env: {
+			'PORT': port,
+			'NODE_ENV': isDev ? 'dev' : 'build'
+		},
+		watch: [config.server]
+	};
+
+	return $.nodemon(nodeOtions)
+		.on('restart', ['vet'], function (env) {
+			log('*** nodemon restarted');
+			log('files changed on restart:\n' + env);
+		})
+		.on('start', function () {
+			log('*** nodemon started');
+		})
+		.on('crash', function () {
+			log('*** nodemon crashed');
+		})
+		.on('exit', function () {
+			log('*** nodemon excited cleanly');
+		});
 });
 
 ///////////Clean CSS files
@@ -84,7 +163,7 @@ gulp.task('clean-css', function (done) {
 ///////////Clean
 
 function clean(path, done) {
-	log('Limpando: ' + $.util.colors.blues(path));
+	log('Limpando: ' + $.util.colors.blue(path));
 	del(path, done);
 }
 
