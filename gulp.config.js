@@ -18,7 +18,7 @@ module.exports = function () {
 		client: client,
 		bower: {
 			json: require('./bower.json'),
-			directory: './client/bower_components',
+			directory: './bower_components',
 			ignorePath: '../..'
 		},
 		css: './.tmp/main.css',

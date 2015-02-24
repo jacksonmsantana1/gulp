@@ -1,6 +1,6 @@
 {
   "name": "gulp-project",
-  "version": "1.0.0",
+  "version": "0.0.0",
   "description": "Project with a complete gulpfile.",
   "main": "gulpfile.js",
   "repository": "https://github.com/jacksonmsantana1/gulp",
