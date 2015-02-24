@@ -1,5 +1,6 @@
 module.exports = function () {
 	var client = './client';
+	var root = './';
 	var config = {
 		alljs: ['./**/*.js'],
 		less: client + '/assets/less/*.less',
@@ -21,9 +22,27 @@ module.exports = function () {
 			ignorePath: '../..'
 		},
 		css: './.tmp/main.css',
+		fonts: './client/bower_components/font-awesome/fonts/**/*.*',
+		html: client + '/**/*.html',
 		defaultPort: 8000,
 		nodeServer: './server/app.js',
-		server: './server/'
+		server: './server/',
+		build: './build/',
+		images: './client/assets/images/**/*.*',
+		templateCache: {
+			file: 'template.js',
+			options: {
+				module: '', //Nome do modulo do aplicativo
+				standAlone: false,
+				root: 'app'
+			}
+		},
+		htmltemplates: client + '/**/*.html',
+		packages: [
+			'./package.json',
+			'./bower.json'
+		],
+		root: root
 	};
 
 	config.getWiredepDefaultOptions = function () {
