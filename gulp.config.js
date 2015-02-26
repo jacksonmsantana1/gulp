@@ -60,7 +60,8 @@ module.exports = function () {
 			'node_modules/chai/chai.js',
 			'node_modules/mocha-clean/index.js',
 			'node_modules/sinon-chai/lib/sinon-chai.js'
-		]
+		],
+		e2e: [client + '/**/*e2e.js']
 	};
 
 	config.getWiredepDefaultOptions = function () {

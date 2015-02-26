@@ -32,6 +32,10 @@ var del = require('del');
 var port = process.env.PORT || config.defaultPort;
 var lib    = require('bower-files')();
 var _ = require('lodash');
+var protractor = require("gulp-protractor").protractor;
+var path = require('path');
+var child_process = require('child_process');
+
 
 //////////Tasks Listing
 
@@ -369,7 +373,7 @@ function startBrowserSync(isDev, specRunner) {
 };
 
 ///////////Karma Test
-  
+
 //gulp serve-test (Show the results pn the browser)
 //gulp serve-test --startServers (include server tests)
 //gulp test (Show the results on command line)
@@ -416,6 +420,15 @@ gulp.task('build-test', ['templatecache'], function () {
 			{name: 'inject:templates', read: false}))
 		.pipe($.inject(gulp.src(config.js)))
 		.pipe(gulp.dest(config.client));
+});
+
+//First of run this task, run the 'webdriver-manager start' command
+gulp.task('protractor',function(cb) {
+    gulp.src(config.e2e).pipe(protractor({
+        configFile: 'protractor-conf.js',
+    })).on('error', function(e) {
+        console.log(e)
+    }).on('end', cb);        
 });
 
 ///////////Test
@@ -522,4 +535,13 @@ function log(msg) {
 	} else {
 		$.util.log($.util.colors.blue(msg));
 	}
+}
+
+//Protractor config
+
+function getProtractorBinary(binaryName){
+    var winExt = /^win/.test(process.platform)? '.cmd' : '';
+    var pkgPath = require.resolve('protractor');
+    var protractorDir = path.resolve(path.join(path.dirname(pkgPath), '..', 'bin'));
+    return path.join(protractorDir, '/'+binaryName+winExt);
 }
