@@ -30,6 +30,8 @@ var $ = require('gulp-load-plugins')({lazy: true}); //Falta ainda usar o npm.
 var config = require('./gulp.config')();
 var del = require('del');
 var port = process.env.PORT || config.defaultPort;
+var lib    = require('bower-files')();
+var _ = require('lodash');
 
 //////////Tasks Listing
 
@@ -173,9 +175,40 @@ gulp.task('inject', ['wiredep', 'stylus'], function () {
 		.pipe(gulp.dest(config.client));
 });
 
+gulp.task('lib-js', function () {
+  gulp.src(lib.ext('js').files)
+    .pipe($.concat('lib.min.js'))
+    .pipe($.uglify())
+    .pipe(gulp.dest('build/js'));
+});
+
+gulp.task('lib-css', function () {
+	var  minifyCSS = require('gulp-minify-css')
+  gulp.src(lib.ext('css').files)
+  	.pipe($.concat('lib.min.css'))
+    .pipe(minifyCSS({keepSpecialComments: 0}))
+    .pipe(gulp.dest('build/styles'));
+});
+
+
+///////////Build
+
+gulp.task('build', ['optimize' ,'fonts', 'images', 'lib-js', 'lib-css'], function () {
+	log('Building everything');
+
+	var msg = {
+		title: 'gulp build',
+		subtitle: 'Deployed to the build folder',
+		message: 'Running `gulp serve-build`'
+	};
+	del(config.temp);
+	log(msg);
+	notify(msg);
+});
+
 ///////////Opmitize
 
-gulp.task('optimize', ['inject', 'fonts', 'images'], function () {
+gulp.task('optimize', ['inject', 'test'], function () {
 	log('Optimizing the javascript, css, html.');
 
 	var assets = $.useref.assets({searchPath: './'});
@@ -185,8 +218,7 @@ gulp.task('optimize', ['inject', 'fonts', 'images'], function () {
 	var jsLibFilter = $.filter('**/lib.js');
 	var jsAppFilter = $.filter('**/app.js');
 
-	return gulp
-		.src(config.index)
+		gulp.src(config.index)
 		.pipe($.plumber())
 		.pipe($.inject(gulp.src(templateCache, {read: false}), {
 			starttag: '<!-- inject:templates:js -->'
@@ -195,13 +227,13 @@ gulp.task('optimize', ['inject', 'fonts', 'images'], function () {
 		.pipe(cssFilter)
 		.pipe($.csso())
 		.pipe(cssFilter.restore())
-		.pipe(jsLibFilter)
-		.pipe($.uglify())
-		.pipe(jsLibFilter.restore())
 		.pipe(jsAppFilter)
-		.pipe($.ngAnnotate())
 		.pipe($.uglify())
 		.pipe(jsAppFilter.restore())
+		.pipe(jsLibFilter)
+		.pipe($.ngAnnotate())
+		.pipe($.uglify())
+		.pipe(jsLibFilter.restore())
 		.pipe($.rev())
 		.pipe(assets.restore())
 		.pipe($.useref())
@@ -240,7 +272,7 @@ gulp.task('bump', function () {
 
 ///////////Serve-Build
 
-gulp.task('serve-build', ['optimize'], function () {
+gulp.task('serve-build', ['build'], function () {
 	serve(false);
 });
 
@@ -252,7 +284,7 @@ gulp.task('serve-dev', ['inject'], function () {
 
 ///////////Serve
 
-function serve(isDev) {
+function serve(isDev, specRunner) {
 	var nodeOptions = {
 		script: config.nodeServer, //app.js
 		delayTime: 1,
@@ -274,7 +306,7 @@ function serve(isDev) {
 		})
 		.on('start', function () {
 			log('*** nodemon started');
-			startBrowserSync(isDev);
+			startBrowserSync(isDev, specRunner);
 		})
 		.on('crash', function () {
 			log('*** nodemon crashed');
@@ -286,7 +318,7 @@ function serve(isDev) {
 
 ///////////BrowserSync
 
-function startBrowserSync(isDev) {
+function startBrowserSync(isDev, specRunner) {
 	if (args.nosync || browserSync.active) {
 		return;
 	}
@@ -311,7 +343,7 @@ function startBrowserSync(isDev) {
 		proxy: 'localhost' + port,
 		port: 3000,
 		files: isDev ? [
-			config.client + '**/*.*',
+			config.client + '/**/*.*',
 			'!' + config.less,
 			config.tmp + '**/*.css'
 		] : [],
@@ -329,8 +361,116 @@ function startBrowserSync(isDev) {
 		reloadDelay: 1000
 	};
 
+	if (specRunner) {
+		options.startPath = config.specRunnerFile;
+	}
+
 	browserSync(options);
 };
+
+///////////Karma Test
+  
+//gulp serve-test (Show the results pn the browser)
+//gulp serve-test --startServers (include server tests)
+//gulp test (Show the results on command line)
+//gulp test --startServers (include server tests)
+//gulp autotest (Continuos integration test)
+
+gulp.task('test', [/*'vet',*/ 'templatecache'], function (done) {
+	startTests(true /* single run*/ , done);
+});
+
+gulp.task('autotest', [/*'vet',*/ 'templatecache'], function (done) {
+	startTests(false /* single run*/ , done);
+});
+
+gulp.task('serve-test', function (done) {
+	log('Run the test runner.');
+	serve(true, true);
+	done();
+});
+
+gulp.task('build-test', ['templatecache'], function () {
+	log('Building the test runner.');
+
+	var wiredep = require('wiredep').stream;
+	var options = config.getWiredepDefaultOptions();
+	var specs = config.specs;
+
+	options.devDependencies = true;
+
+	if (args.startServers) {
+		specs = [].concat(specs, config.serverIntegrationSpecs);
+	}
+
+	return gulp
+		.src(config.specRunner)
+		.pipe(wiredep(options))
+		.pipe($.inject(gulp.src(config.testlibraries),
+			{name: 'inject:testlibraries', read: false}))
+		.pipe($.inject(gulp.src(config.specHelpers),
+			{name: 'inject:spechelpers', read: false}))
+		.pipe($.inject(gulp.src(specs),
+			{name: 'inject:specs', read: false}))
+		.pipe($.inject(gulp.src(config.tmp + config.templateCache.file),
+			{name: 'inject:templates', read: false}))
+		.pipe($.inject(gulp.src(config.js)))
+		.pipe(gulp.dest(config.client));
+});
+
+///////////Test
+
+function startTests(singleRun, done) {
+	var child;
+	var fork  = require('child_process').fork;
+	var karma = require('karma').server;
+	var excludeFiles = [];
+	var serverSpecs = config.serverIntegrationSpecs;
+
+	if (args.startServers) {  //gulp test --startServers
+		log('Starting server.');
+		var savedEnv = process.env;
+		savedEnv.NODE_ENV = 'dev';
+		savedEnv.PORT = 8888;
+		child = fork(config.nodeServer);
+	} else {
+		if (serverSpecs && serverSpecs.length) {
+			excludeFiles = serverSpecs;
+		}	
+	}
+	
+	karma.start({
+		configFile: __dirname + '/karma.conf.js',
+		exclude: excludeFiles,
+		singleRun: !!singleRun
+	}, karmaCompleted);
+
+	function karmaCompleted(karmaResult) {
+		log('Karma completed!');
+		if (child) {
+			log('Shutting down the child process.');
+			child.kill();
+		}
+		if (karmaResult === 1) {
+			done('Karma: tests failed with code ' + karmaResult);
+		} else {
+			done();
+		}
+	}
+}
+
+///////////Notify
+
+function notify(options) {
+	var notifier = require('node-notifier');
+	var notifyOptions = {
+		sound: 'Bottle',
+		contentImage: path.join(__dirname, 'gulp.png'),
+		icon: path.join(__dirname, 'gulp.png')
+	};
+	_.assign(notifyOptions, options);
+	notifier.notify(notifyOptions);
+}
 
 ///////////ChangeEvent
 

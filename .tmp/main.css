@@ -3,4 +3,5 @@ body {
 }
 a.button {
   border-radius: 5px;
+  font: 12px Helvetica, Arial, sans-serif;
 }
