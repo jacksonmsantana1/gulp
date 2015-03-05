@@ -1,0 +1,10 @@
+<form name="form" ng-submit="submit()" class="form-signin">
+		<h1 class="form-signin-heading text-muted">Register</h1>
+			<input type="email" ng-model="email" class="form-control" placeholder="Email address" required autofocus>
+			<input name="password" ng-model="password" type="password" class="form-control" placeholder="Password"  required>
+			<input name="password_confirm" ng-model="password_confirm"  type="password" class="form-control" placeholder="Confirm Password" ng-blur="checkPws()" required>
+			<p class="help-block" ng-if="alert">please match the passwords</p>
+			<button class="btn btn-lg btn-primary btn-block" ng-disabled="alert"  type="submit">
+			Sign In
+			</button>
+</form>

@@ -38,7 +38,7 @@ module.exports = function () {
 		templateCache: {
 			file: 'template.js',
 			options: {
-				module: '', //Nome do modulo do aplicativo
+				module: 'project-gulp', //Nome do modulo do aplicativo
 				standAlone: false,
 				root: 'app/'
 			}

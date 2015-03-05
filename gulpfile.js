@@ -205,14 +205,14 @@ gulp.task('build', ['optimize' ,'fonts', 'images', 'lib-js', 'lib-css'], functio
 		subtitle: 'Deployed to the build folder',
 		message: 'Running `gulp serve-build`'
 	};
-	del(config.temp);
+	del(config.tmp);
 	log(msg);
 	notify(msg);
 });
 
 ///////////Opmitize
 
-gulp.task('optimize', ['inject', 'test'], function () {
+gulp.task('optimize', ['inject'/* , 'test' */], function () {
 	log('Optimizing the javascript, css, html.');
 
 	var assets = $.useref.assets({searchPath: './'});
@@ -300,7 +300,7 @@ function serve(isDev, specRunner) {
 	};
 
 	return $.nodemon(nodeOptions)
-		.on('restart', ['vet'], function (env) {
+		.on('restart', [/*'vet'*/], function (env) {
 			log('*** nodemon restarted');
 			log('files changed on restart:\n' + env);
 			setTimeout(function () {
@@ -319,6 +319,8 @@ function serve(isDev, specRunner) {
 			log('*** nodemon excited cleanly');
 		});
 };
+
+
 
 ///////////BrowserSync
 
@@ -344,7 +346,7 @@ function startBrowserSync(isDev, specRunner) {
 	}
 
 	var options = {
-		proxy: 'localhost' + port,
+		proxy: 'localhost:' + port,
 		port: 3000,
 		files: isDev ? [
 			config.client + '/**/*.*',
@@ -353,7 +355,7 @@ function startBrowserSync(isDev, specRunner) {
 		] : [],
 		ghostMode: {
 			clicks: true,
-			location: false,
+			location: true,
 			forms: true,
 			scroll: true
 		},
@@ -535,13 +537,4 @@ function log(msg) {
 	} else {
 		$.util.log($.util.colors.blue(msg));
 	}
-}
-
-//Protractor config
-
-function getProtractorBinary(binaryName){
-    var winExt = /^win/.test(process.platform)? '.cmd' : '';
-    var pkgPath = require.resolve('protractor');
-    var protractorDir = path.resolve(path.join(path.dirname(pkgPath), '..', 'bin'));
-    return path.join(protractorDir, '/'+binaryName+winExt);
 }
