@@ -3,9 +3,12 @@
 //var jwt = require('./jwt');
 var jwt = require('jsonwebtoken');
 var config = require('../config/environment');
+var compose = require('composable-middleware');
 
 function isAutheticated(req, res, next) {
+	console.log(req);
 	return function (req, res, next) {
+		console.log(req);
 
 		var token = req.headers.authorization.split(' ')[1];
 		jwt.verify(token, config.secret, function (err, payload) {
@@ -37,5 +40,24 @@ function createSendToken(user, res) {
 	});
 }
 
+function hasRole(roleRequired) {
+	console.log(roleRequired);
+	if (!roleRequired) {
+        return res.status(401).send({ok: false, msn: "This role: " +roleRequired+ " not exist"});
+    }
+
+    return compose()
+        .use(isAutheticated())
+        .use(function meetsRequirements(req, res, next, payload) {
+            if (config.userRoles.indexOf(payload.sub.role) >= config.userRoles.indexOf(roleRequired)) {
+                next();
+            }
+            else {
+                res.status(403).send({ok: false, isAdmin: false});
+            }
+        });
+}
+
 exports.isAutheticated = isAutheticated;
 exports.createSendToken = createSendToken;
+exports.hasRole = hasRole;

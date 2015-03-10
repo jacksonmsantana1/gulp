@@ -9,6 +9,9 @@
 		<li ng-if="isAutheticated" ui-sref-active="active">
 			<a ui-sref="logout">Logout</a>
 		</li>
+        <li ng-if="isAutheticated" ui-sref-active="active">
+            <a ui-sref="admin">Admin</a>
+        </li>
 		<li ng-if="!isAutheticated" ui-sref-active="active">
 			<a ui-sref="login">Login</a>
 		</li>

@@ -21,6 +21,10 @@ angular.module('project-gulp')
 					email: email,
 					password: password
 				}).success(authSuccessful);
-			}
+			},
+
+            isAdmin: function () {
+                return $http.get(API_URL + '/api/login');
+            }
 		}
 	});
