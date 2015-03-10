@@ -39,5 +39,5 @@ angular
                 }
             });
         })
-		.constant('API_URL', 'http://localhost:7203');
+		.constant('API_URL', 'http://localhost:8000');
 
