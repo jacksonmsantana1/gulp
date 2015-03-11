@@ -55,7 +55,7 @@ angular.module('project-gulp')
             isAdmin: function () {
                 var user = getUser();
                 if (Object.keys(user).length !== 0) {
-                    return getUser().sub.role === 'Admin';
+                    return user.sub.role === 'Admin';
                 }
                 return false;
             },
