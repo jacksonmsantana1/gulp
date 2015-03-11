@@ -4,24 +4,34 @@
 var jwt = require('jsonwebtoken');
 var config = require('../config/environment');
 var compose = require('composable-middleware');
+var User = require('../../server/api/user/userModel');
 
 function isAutheticated(req, res, next) {
-	console.log(req);
 	return function (req, res, next) {
-		console.log(req);
+			var token = req.headers.authorization.split(' ')[1];
+			jwt.verify(token, config.secret, function (err, payload) {
+                if (err) {
+                    if (err.name === 'TokenExpiredError') {
+                        return res.status(401).send({ok: false, msn: "Session timeout: Token expired!"});
+                    } else if (err.name === 'JsonWebTokenError') {
+                        return res.status(401).send({ok: false, msn: err.message});
+                    }
+                }
+                User.findById(payload.sub.id, function (err, user) {
 
-		var token = req.headers.authorization.split(' ')[1];
-		jwt.verify(token, config.secret, function (err, payload) {
-			if (err.name === 'TokenExpiredError') {
-				return res.status(401).send({ok: false, msn: "Session timeout: Token expired!"});
-			} else if (err.name === 'JsonWebTokenError') {
-				return res.status(401).send({ok: false, msn: err.message});
-			} else {
-				console.log('Payload: '  + payload);
-				next(payload);
-			}
-		});
-	}
+                    if (err) {
+                        return next(err);
+                    }
+
+                    if (!user) {
+                        return res.status(401).json({ok: 'false', info: 'no user found on authentication'});
+                    }
+
+                    req.user = user;
+                    next();
+                });
+			});
+		};
 }
 
 function createSendToken(user, res) {
@@ -41,15 +51,15 @@ function createSendToken(user, res) {
 }
 
 function hasRole(roleRequired) {
-	console.log(roleRequired);
+
 	if (!roleRequired) {
         return res.status(401).send({ok: false, msn: "This role: " +roleRequired+ " not exist"});
     }
 
     return compose()
         .use(isAutheticated())
-        .use(function meetsRequirements(req, res, next, payload) {
-            if (config.userRoles.indexOf(payload.sub.role) >= config.userRoles.indexOf(roleRequired)) {
+        .use(function (req, res, next) {
+            if (config.userRoles.indexOf(req.user.role) >= config.userRoles.indexOf(roleRequired)) {
                 next();
             }
             else {

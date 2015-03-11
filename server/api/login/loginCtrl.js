@@ -7,6 +7,6 @@ module.exports = {
 		Auth.createSendToken(req.user, res)
 	},
     isAdmin: function (req, res) {
-        res.status(200).send({ok: true, isAdmin: true});
+        Auth.createSendToken(req.user, res)
     }
 };

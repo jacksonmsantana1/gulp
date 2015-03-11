@@ -17,8 +17,6 @@ exports.setup = function (User) {
 	    var searchUser = {
 		    email: email
 	    };
-        
-        console.log(searchUser);
 
 	    User.findOne(searchUser, function (err, user) {
 		    	if (err) return done(err);
@@ -26,8 +24,6 @@ exports.setup = function (User) {
 			    if (!user) {
 				    return done(null, false, {message: 'Wrong email/password'});
 			    }
-
-                console.log(user);
 
 			    user.comparePasswords(password, function (err, isMatch) {
 				    if (err) return done(err);

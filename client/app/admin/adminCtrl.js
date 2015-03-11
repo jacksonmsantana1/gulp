@@ -5,9 +5,11 @@
 
 angular.module('project-gulp')
     .controller('AdminCtrl', function ($scope, Auth) {
-        $scope.admin = Auth.isAdmin().then(function (res) {
-            return true;
-        }, function (err) {
-            return false;
-        });
+        Auth.isAdmin()
+            .success(function (res) {
+                $scope.admin = true;
+            })
+            .error(function (err) {
+                $scope.admin = false;
+            });
     });

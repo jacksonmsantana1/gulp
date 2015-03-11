@@ -8,6 +8,11 @@ angular.module('project-gulp')
 			$state.go('main');
 		}
 
+		function adminSuccessful(res) {
+			AuthToken.setToken(res.token);
+			$state.go('admin');
+		}
+
 		return {
 			login: function (email, password) {
 				return $http.post(API_URL + '/api/login', {
@@ -24,7 +29,8 @@ angular.module('project-gulp')
 			},
 
             isAdmin: function () {
-                return $http.get(API_URL + '/api/login');
+                return $http.post(API_URL + '/api/login/admin')
+                    .success(adminSuccessful);
             }
 		}
 	});
