@@ -15,6 +15,7 @@ console.log('** Starting Node Server. **');
 console.log('PORT=' + config.port);
 console.log('NODE_ENV=' + config.env);
 
+
 var MONGODB_URI = config.db.baseUrl + config.db.projectName,
 
     /**

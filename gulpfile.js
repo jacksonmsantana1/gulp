@@ -427,7 +427,7 @@ gulp.task('build-test', ['templatecache'], function () {
 //First of run this task, run the 'webdriver-manager start' command
 gulp.task('protractor',function(cb) {
     gulp.src(config.e2e).pipe(protractor({
-        configFile: 'protractor-conf.js',
+        configFile: 'protractor-conf.js'
     })).on('error', function(e) {
         console.log(e)
     }).on('end', cb);        

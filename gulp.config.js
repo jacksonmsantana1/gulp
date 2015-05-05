@@ -30,7 +30,7 @@ module.exports = function () {
 		css: './.tmp/main.css',
 		fonts: './bower_components/font-awesome/fonts/**/*.*',
 		html: client + '/**/*.html',
-		defaultPort: 8000,
+		defaultPort: 7203,
 		nodeServer: server + 'app.js',
 		server: server,
 		build: './build/',
