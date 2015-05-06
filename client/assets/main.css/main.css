@@ -1,0 +1,9 @@
+body {
+  font: 12px Helvetica, Arial, sans-serif;
+  background-color: #20b2aa;
+}
+a.button {
+  border-radius: 5px;
+  font: 12px Helvetica, Arial, sans-serif;
+  background-color: #fca600;
+}
