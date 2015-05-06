@@ -8,14 +8,13 @@ module.exports = function(options) {
     gulp.task('styles', function () {
 
         var injectFiles = gulp.src([
-            options.client + '/assets/stylus/*.styl',
-            '!' + options.client + '/app/index.styl',
-            '!' + options.client + '/app/vendor.styl'
+            options.client + '/app/**/*.styl',
+            '!' + options.client + '/assets/stylus/index.styl'
         ], { read: false });
 
         var injectOptions = {
             transform: function(filePath) {
-                filePath = filePath.replace(options.client + '/assets/stylus/', '');
+                filePath = filePath.replace(options.client + '/app/', '');
                 return '@import \'' + filePath + '\';';
             },
             starttag: '// injector',
@@ -23,10 +22,10 @@ module.exports = function(options) {
             addRootSlash: false
         };
 
-        var mainFilter = $.filter('main.styl');
+        var indexFilter = $.filter('index.styl');
 
         return gulp.src([
-            options.client + '/assets/stylus/main.styl',
+            options.client + '/assets/stylus/index.styl'
         ])
             .pipe(indexFilter)
             .pipe($.inject(injectFiles, injectOptions))
