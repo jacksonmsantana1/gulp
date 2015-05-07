@@ -5,6 +5,8 @@ var $ = require('gulp-load-plugins')();
 var wiredep = require('wiredep').stream;
 
 module.exports = function(options) {
+
+    //Styles
     gulp.task('styles', function () {
 
         var injectFiles = gulp.src([

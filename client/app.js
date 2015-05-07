@@ -24,12 +24,12 @@ angular
                         $state.go('login');
                     }
                 });
+                console.log("vai tomar no seu cu");
             });
 
             $rootScope.$on('$stateChangeSuccess', function(event, toState, toParams, fromState) {
                 $rootScope.previousState = fromState;
                 $rootScope.actualState = toState;
-                console.log("Vai tomarr no seu cu");
             });
 
             $rootScope.$on('$stateChangeError', function() {

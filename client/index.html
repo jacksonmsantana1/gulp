@@ -9,16 +9,21 @@
 
 	<!-- build:css({.tmp/serve,src}) styles/lib.css -->
 	<!-- bower:css -->
-    <!-- run `gulp inject` to automatically populate bower styles dependencies -->
-    <!-- endbower -->
+	<link rel="stylesheet" href="../bower_components/bootstrap/dist/css/bootstrap.css" />
+	<link rel="stylesheet" href="../bower_components/font-awesome/css/font-awesome.css" />
+	<!-- endbower -->
     <!-- endbuild -->
 
 
-    <!-- build:css({.tmp/serve,client}) styles/app.css -->
-	<link rel="stylesheet" href="app/index.css">
-    <!-- endbuild -->
+	<!-- build:css({.tmp/serve,client}) styles/app.css -->
+    <link rel="stylesheet" href="app/index.css">
+    <!-- inject:css -->
+	<link rel="stylesheet" href="/.tmp/serve/app/index.css">
+	<!-- endinject -->
+	<!-- endbuild -->
+
 </head>
-	<body>
+<body>
 	<!--[if lt IE 10]>
 	<p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
 	<![endif]-->
@@ -45,13 +50,32 @@
 
 	<!-- build:js(client) scripts/lib.js -->
 	<!-- bower:js -->
-	<!-- run `gulp inject` to automatically populate bower script dependencies -->
+	<script src="../bower_components/jquery/dist/jquery.js"></script>
+	<script src="../bower_components/angular/angular.js"></script>
+	<script src="../bower_components/bootstrap/dist/js/bootstrap.js"></script>
+	<script src="../bower_components/moment/moment.js"></script>
+	<script src="../bower_components/ui-router/release/angular-ui-router.js"></script>
 	<!-- endbower -->
 	<!-- endbuild -->
 
 	<!-- build:js({.tmp/serve,.tmp/partials,client}) scripts/app.js -->
 	<!-- inject:js -->
-	<!-- js files will be automatically insert here -->
+	<script src="/client/app.js"></script>
+	<script src="/client/app/login/login.js"></script>
+	<script src="/client/app/login/loginCtrl.js"></script>
+	<script src="/client/app/logout/logout.js"></script>
+	<script src="/client/app/logout/logoutCtrl.js"></script>
+	<script src="/client/app/admin/admin.js"></script>
+	<script src="/client/app/admin/adminCtrl.js"></script>
+	<script src="/client/app/main/main.js"></script>
+	<script src="/client/app/main/mainCtrl.js"></script>
+	<script src="/client/app/navBar/navBarCtrl.js"></script>
+	<script src="/client/app/user/register/register.js"></script>
+	<script src="/client/app/user/register/registerCtrl.js"></script>
+	<script src="/client/components/interceptors/authInterceptor.js"></script>
+	<script src="/client/components/services/alert.js"></script>
+	<script src="/client/components/services/auth.js"></script>
+	<script src="/client/components/services/authToken.js"></script>
 	<!-- endinject -->
 
 	<!-- inject:partials -->
@@ -60,4 +84,4 @@
 	<!-- endbuild -->
 
 	</body>
-	</html>
+</html>

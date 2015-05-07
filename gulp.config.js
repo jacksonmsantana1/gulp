@@ -18,8 +18,8 @@ module.exports = function () {
 			client +  '/*.js',
 			client + '/app/**/*.js',
 			client + '/components/**/*.js',
-			'!'+ client +'/**/*Test.js',
-			'!'+ client +'/**/*E2E.js'
+			'!'+ client +'/**/*.spec.js',
+			'!'+ client +'/**/*.mock.js'
 		],
 		client: client,
 		bower: {
