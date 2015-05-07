@@ -52,10 +52,7 @@ module.exports = function(options) {
         });
     }
 
-    gulp.task('test', /*['hints'],*/ function(done) {
+    gulp.task('fTest', /*['hints'],*/ function(done) {
         runTests(true, done);
-    });
-    gulp.task('test:auto', ['watch'], function(done) {
-        runTests(false, done);
     });
 };

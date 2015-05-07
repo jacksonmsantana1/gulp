@@ -32,7 +32,7 @@ module.exports = function(options) {
         };
 
         return $.nodemon(nodeOptions)
-            .on('restart', [/*'vet'*/], function (env) {
+            .on('restart', [/*'hints', 'bTest'*/], function (env) {
                 gutil.log('*** nodemon restarted');
                 gutil.log('files changed on restart:\n' + env);
                 setTimeout(function () {
@@ -40,7 +40,7 @@ module.exports = function(options) {
                     browserSync.reload({stream: false});
                 }, 1000);
             })
-            .on('start', function () {
+            .on('start', [/*'hints', 'fTest','bTest'*/], function () {
                 gutil.log('*** nodemon started');
                 startBrowserSync(isDev, options);
             })
@@ -97,6 +97,9 @@ module.exports = function(options) {
         };
 
         browserSync(optionsBrownserSync);
+        require('browser-sync').create().on('change',function () {
+           console.log("CUUUUU");
+        });
     };
 
     //Change event

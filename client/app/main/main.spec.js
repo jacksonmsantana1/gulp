@@ -13,6 +13,6 @@ describe('Main Controller', function(){
         $controller('MainCtrl', {
             $scope: scope
         });
-        expect(true).toBeTruthy();
+        expect(true).to.be.true;
     }));
 });
